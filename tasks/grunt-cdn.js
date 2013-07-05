@@ -19,10 +19,10 @@ module.exports = function(grunt) {
     hbs: 'html'
   };
 
-  var reghtmls = [
-    new RegExp(/<(?:img|link|source|script).*\b(?:href|src)=['"]([^'"\{]+)['"].*\/?>/ig),
-    new RegExp(/<script.*\bdata-main=['"]([^'"\{]+)['"].*\/?>/ig)
-  ];
+	var reghtmls = [
+		new RegExp(/<(?:img|link|source|script).*?\b(?:href|src)=['"]([^'"\{]+)['"].*?\/?>/ig),
+		new RegExp(/<script.*?\bdata-main=['"]([^'"\{]+)['"].*?\/?>/ig)
+	];
 
   var regcss = new RegExp(/url\(([^)]+)\)/ig);
 
