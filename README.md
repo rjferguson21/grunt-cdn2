@@ -8,7 +8,7 @@ Install this grunt plugin next to your project's gruntfile with: `npm install gr
 Then add this line to your project's `Gruntfile.js` gruntfile:
 
 ```javascript
-grunt.loadNpmTasks('grunt-cdn');
+grunt.loadNpmTasks('grunt-cdn2');
 ```
 
 Then specify your config:
