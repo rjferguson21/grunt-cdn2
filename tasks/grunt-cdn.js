@@ -6,51 +6,51 @@
  */
 module.exports = function(grunt) {
 
-	var fs = require('fs');
-	var url = require('url');
-	var path = require('path');
-	var crypto = require('crypto');
+  var fs = require('fs');
+  var url = require('url');
+  var path = require('path');
+  var crypto = require('crypto');
 
-	var supportedTypes = {
-		html: 'html',
-		css: 'css',
-		soy: 'html',
-		ejs: 'html',
-		hbs: 'html'
-	};
+  var supportedTypes = {
+    html: 'html',
+    css: 'css',
+    soy: 'html',
+    ejs: 'html',
+    hbs: 'html'
+  };
 
-	var reghtmls = [
-		new RegExp(/<(?:img|link|source|script).*\b(?:href|src)=['"]([^'"\{]+)['"].*\/?>/ig),
-		new RegExp(/<script.*\bdata-main=['"]([^'"\{]+)['"].*\/?>/ig)
-	];
+  var reghtmls = [
+    new RegExp(/<(?:img|link|source|script).*\b(?:href|src)=['"]([^'"\{]+)['"].*\/?>/ig),
+    new RegExp(/<script.*\bdata-main=['"]([^'"\{]+)['"].*\/?>/ig)
+  ];
 
-	var regcss = new RegExp(/url\(([^)]+)\)/ig);
+  var regcss = new RegExp(/url\(([^)]+)\)/ig);
 
-	grunt.registerMultiTask('cdn', "Properly prepends a CDN url to those assets referenced with absolute paths (but not URLs)", function() {
-		var files = this.files;
-        var options = this.options();
-		var relativeTo = this.options().cdn;
-        var self = this;
+  grunt.registerMultiTask('cdn', "Properly prepends a CDN url to those assets referenced with absolute paths (but not URLs)", function() {
+    var files = this.files;
+    var options = this.options();
+    var relativeTo = this.options().cdn;
+    var self = this;
 
-        var supportedTypes = {
-            html: 'html',
-            css: 'css',
-            soy: 'html',
-            ejs: 'html',
-            hbs: 'html'
-        };
+    var supportedTypes = {
+      html: 'html',
+      css: 'css',
+      soy: 'html',
+      ejs: 'html',
+      hbs: 'html'
+    };
 
-        for(var key in options.supportedTypes){
-            supportedTypes[key] = options.supportedTypes[key];
-        }
+    for (var key in options.supportedTypes) {
+      supportedTypes[key] = options.supportedTypes[key];
+    }
 
-		files.forEach(function(file) {
-      file.src.forEach(function (filepath) {
+    files.forEach(function(file) {
+      file.src.forEach(function(filepath) {
         var type = path.extname(filepath).replace(/^\./, ''),
-            filename = path.basename(filepath),
-            destfile = file.dest ? path.join(file.dest, filename) : filepath,
-            content = grunt.file.read(filepath),
-            fileRelativeTo = file.cdn ? file.cdn : relativeTo;
+          filename = path.basename(filepath),
+          destfile = file.dest ? path.join(file.dest, filename) : filepath,
+          content = grunt.file.read(filepath),
+          fileRelativeTo = file.cdn ? file.cdn : relativeTo;
         content = content.toString(); // sometimes css is interpreted as object
         if (!supportedTypes[type]) { //next
           console.warn("unrecognized extension:" + type + " - " + filepath);
@@ -65,93 +65,93 @@ module.exports = function(grunt) {
         // write the contents to destination
         grunt.file.write(destfile, content);
       });
-		});
-	});
+    });
+  });
 
-	function html(content, filename, relativeTo) {
-        var self = this;
-		return reghtmls.reduce(function (value, reghtml) {
-			return value.replace(reghtml, function(match, resource) {
-			  return match.replace(resource, cdnUrl.call(self, resource, filename, relativeTo));
-			});
-		}, content);
-	};
+  function html(content, filename, relativeTo) {
+    var self = this;
+    return reghtmls.reduce(function(value, reghtml) {
+      return value.replace(reghtml, function(match, resource) {
+        return match.replace(resource, cdnUrl.call(self, resource, filename, relativeTo));
+      });
+    }, content);
+  };
 
-	function css(content, filename, relativeTo) {
-        var self = this;
-		return content.replace(regcss, function(attr, resource) {
-			resource = resource.replace(/^['"]/, '').replace(/['"]$/, '');
-			var url = cdnUrl.call(self, resource, filename, relativeTo);
-			if (!url) return attr;
+  function css(content, filename, relativeTo) {
+    var self = this;
+    return content.replace(regcss, function(attr, resource) {
+      resource = resource.replace(/^['"]/, '').replace(/['"]$/, '');
+      var url = cdnUrl.call(self, resource, filename, relativeTo);
+      if (!url) return attr;
 
-			return grunt.template.process("url('<%= url %>')", {
-				data: {
-					url: url
-				}
-			});
-		});
-	};
-
-	function cdnUrl(resource, filename, relativeTo) {
-        var options = this.options();
-		// skip those absolute urls
-		if (resource.match(/^https?:\/\//i) || resource.match(/^\/\//) || resource.match(/^data:/i)) {
-			grunt.verbose.writeln("skipping " + resource + " it's an absolute (or data) URL");
-			return resource;
-		}
-
-		var resourceUrl = url.parse(resource);
-
-        // if flatten is true then we will convert all paths to absolute here!
-        if (options.flatten) {
-            resourceUrl.pathname = '/' + resourceUrl.pathname.replace(/^(\.\.?\/)+/, '');
+      return grunt.template.process("url('<%= url %>')", {
+        data: {
+          url: url
         }
+      });
+    });
+  };
 
-        if (options.match) {
-            if (typeof options.match === 'function') {
-                if (!options.match(resourceUrl, resource)) {
-                    grunt.verbose.writeln("skipping " + resource + ", not matched");
-                    return resource;
-                }
-            } else {
-                if (!resourceUrl.pathname.match(options.match)) {
-                    grunt.verbose.writeln("skipping " + resource + ", not matched");
-                    return resource;
-                }
-            }
+  function cdnUrl(resource, filename, relativeTo) {
+    var options = this.options();
+    // skip those absolute urls
+    if (resource.match(/^https?:\/\//i) || resource.match(/^\/\//) || resource.match(/^data:/i)) {
+      grunt.verbose.writeln("skipping " + resource + " it's an absolute (or data) URL");
+      return resource;
+    }
+
+    var resourceUrl = url.parse(resource);
+
+    // if flatten is true then we will convert all paths to absolute here!
+    if (options.flatten) {
+      resourceUrl.pathname = '/' + resourceUrl.pathname.replace(/^(\.\.?\/)+/, '');
+    }
+
+    if (options.match) {
+      if (typeof options.match === 'function') {
+        if (!options.match(resourceUrl, resource)) {
+          grunt.verbose.writeln("skipping " + resource + ", not matched");
+          return resource;
         }
-
-		// if path is relative let it be
-		if (!options.flatten && !grunt.file.isPathAbsolute(resourceUrl.pathname)) {
-			grunt.verbose.writeln("skipping " + resource + " it's a relative URL");
-			return resource;
-		}
-
-        // if stripDirs then loop through and strip
-        if (options.stripDirs) {
-            if (typeof options.stripDirs === 'string') {
-                options.stripDirs = [options.stripDirs];
-            }
-            options.stripDirs.forEach(function(dirname) {
-                var re = new RegExp('\/('+dirname+'\/)', 'g');
-                resourceUrl.pathname = resourceUrl.pathname.replace(re, '');
-            });
+      } else {
+        if (!resourceUrl.pathname.match(options.match)) {
+          grunt.verbose.writeln("skipping " + resource + ", not matched");
+          return resource;
         }
+      }
+    }
 
-        var src = path.join(relativeTo, resourceUrl.pathname).replace(/\\/g, '/').replace(/:\/(\w)/, '://$1');
+    // if path is relative let it be
+    if (!options.flatten && !grunt.file.isPathAbsolute(resourceUrl.pathname)) {
+      grunt.verbose.writeln("skipping " + resource + " it's a relative URL");
+      return resource;
+    }
 
-        // if using protocol-relative CDN URL re-add the leading double-slash removed by path.join
-        if (relativeTo.match(/^\/\/\w/)) {
-            src = src.replace(/^\/(\w)/, '\/\/$1');
-        }
+    // if stripDirs then loop through and strip
+    if (options.stripDirs) {
+      if (typeof options.stripDirs === 'string') {
+        options.stripDirs = [options.stripDirs];
+      }
+      options.stripDirs.forEach(function(dirname) {
+        var re = new RegExp('\/(' + dirname + '\/)', 'g');
+        resourceUrl.pathname = resourceUrl.pathname.replace(re, '');
+      });
+    }
 
-        grunt.log.writeln('Changing ' + resourceUrl.pathname.cyan + ' -> ' + src.cyan);
-		return grunt.template.process("<%= url %><%= search %><%= hash %>", {
-			data: {
-				url: src,
-				hash: (resourceUrl.hash || ''), // keep the original hash too
-				search: (resourceUrl.search || '') // keep the original querystring
-			}
-		});
-	}
+    var src = path.join(relativeTo, resourceUrl.pathname).replace(/\\/g, '/').replace(/:\/(\w)/, '://$1');
+
+    // if using protocol-relative CDN URL re-add the leading double-slash removed by path.join
+    if (relativeTo.match(/^\/\/\w/)) {
+      src = src.replace(/^\/(\w)/, '\/\/$1');
+    }
+
+    grunt.log.writeln('Changing ' + resourceUrl.pathname.cyan + ' -> ' + src.cyan);
+    return grunt.template.process("<%= url %><%= search %><%= hash %>", {
+      data: {
+        url: src,
+        hash: (resourceUrl.hash || ''), // keep the original hash too
+        search: (resourceUrl.search || '') // keep the original querystring
+      }
+    });
+  }
 };
