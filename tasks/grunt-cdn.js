@@ -49,7 +49,8 @@ module.exports = function(grunt) {
         var type = path.extname(filepath).replace(/^\./, ''),
             filename = path.basename(filepath),
             destfile = file.dest ? path.join(file.dest, filename) : filepath,
-            content = grunt.file.read(filepath);
+            content = grunt.file.read(filepath),
+            fileRelativeTo = file.cdn ? file.cdn : relativeTo;
         content = content.toString(); // sometimes css is interpreted as object
         if (!supportedTypes[type]) { //next
           console.warn("unrecognized extension:" + type + " - " + filepath);
@@ -57,9 +58,9 @@ module.exports = function(grunt) {
         }
         grunt.log.subhead('cdn:' + type + ' - ' + filepath);
         if (supportedTypes[type] == "html") {
-          content = html.call(self, content, filepath, relativeTo);
+          content = html.call(self, content, filepath, fileRelativeTo);
         } else if (supportedTypes[type] === "css") {
-          content = css.call(self, content, filepath, relativeTo);
+          content = css.call(self, content, filepath, fileRelativeTo);
         }
         // write the contents to destination
         grunt.file.write(destfile, content);
