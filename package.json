@@ -1,18 +1,18 @@
 {
-  "name": "grunt-cdn-bh",
-  "description": "Properly prepends a CDN url to those assets referenced with absolute paths (but not URLs)",
-  "version": "0.3.0",
-  "homepage": "https://github.com/bradhouse/grunt-cdn",
+  "name": "grunt-cdn2",
+  "description": "Properly prepends a CDN url to those assets referenced with absolute paths (but not URLs). Based on https://github.com/tactivos/grunt-cdn",
+  "version": "1.0.0",
+  "homepage": "https://github.com/bradhouse/grunt-cdn2",
   "author": {
     "name": "Johnny Halife",
     "url": "http://github.com/johnnyhalife/"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/bradhouse/grunt-cdn.git"
+    "url": "git://github.com/bradhouse/grunt-cdn2.git"
   },
   "bugs": {
-    "url": "https://github.com/bradhouse/grunt-cdn/issues"
+    "url": "https://github.com/bradhouse/grunt-cdn2/issues"
   },
   "engines": {
     "node": "*"
