@@ -48,7 +48,7 @@ module.exports = function(grunt) {
       file.src.forEach(function(filepath) {
         var type = path.extname(filepath).replace(/^\./, ''),
           filename = path.basename(filepath),
-          destfile = file.dest ? path.join(file.dest, filename) : filepath,
+          destfile = (file.dest != filepath) ? path.join(file.dest, filename) : filepath,
           content = grunt.file.read(filepath),
           fileRelativeTo = file.cdn ? file.cdn : relativeTo;
         content = content.toString(); // sometimes css is interpreted as object
