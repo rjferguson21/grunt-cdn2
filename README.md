@@ -1,3 +1,5 @@
+# Note: I am not maintaining this repository. Consider using another library or fork.
+
 [Grunt][grunt] plugin for properly prepending a CDN url to those assets referenced with absolute paths (but not URLs)
 
 ## Getting Started
