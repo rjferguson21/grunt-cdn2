@@ -96,7 +96,7 @@ module.exports = function(grunt) {
   function cdnUrl(resource, filename, relativeTo) {
     var options = this.options();
     // skip those absolute urls
-    if (resource.match(/^https?:\/\//i) || resource.match(/^\/\//) || resource.match(/^data:/i)) {
+    if (resource.match(/^https?:\/\//i) || resource.match(/^\/\//) || resource.match(/^data:/i) || resource.match(/^\/api1/i)) {
       grunt.verbose.writeln("skipping " + resource + " it's an absolute (or data) URL");
       return resource;
     }
