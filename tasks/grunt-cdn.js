@@ -21,6 +21,7 @@ module.exports = function(grunt) {
 
 	var reghtmls = [
 		new RegExp(/<(?:img|link|source|script).*?\b(?:href|src)=['"]([^'"\{]+)['"].*?\/?>/ig),
+		new RegExp(/<img.*?\bng-src=['"](\/[^'"]+)['"].*?\/?>/ig),
 		new RegExp(/<script.*?\bdata-main=['"]([^'"\{]+)['"].*?\/?>/ig),
 		new RegExp(/<script.*?\bdata-worker=['"]([^'"\{]+)['"].*?\/?>/ig)
 	];
@@ -99,6 +100,12 @@ module.exports = function(grunt) {
     if (resource.match(/^https?:\/\//i) || resource.match(/^\/\//) || resource.match(/^data:/i) || resource.match(/^\/api1/i)) {
       grunt.verbose.writeln("skipping " + resource + " it's an absolute (or data) URL");
       return resource;
+    }
+    
+    // ng-src
+    if (resource.match(/{{\s*(\w+)\s*}}/i)) {
+      resource = resource.replace(/{{\s*(\w+)\s*}}/i, '{{$1}}');
+      grunt.verbose.writeln("stripped whitespace " + resource);
     }
 
     var resourceUrl = url.parse(resource);
